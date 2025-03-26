@@ -1,0 +1,29 @@
+.container-fluid{
+    background-color: rgb(29, 82, 128);
+}
+
+.container-fluid a {
+    float: left;
+    font-size: 25px;
+    color: black;
+    padding-left: 40px;
+}
+
+.search-container {
+    background-color: rgb(150, 148, 148);
+}
+
+li {
+    list-style-type: none;
+}
+
+.contact-dropdown {
+    position: relative;
+}
+
+.contact-dropdown-content {
+    background-color: rgb(127, 190, 245);
+    position: absolute;
+    border-top: 5px;
+    z-index: 1;
+}
