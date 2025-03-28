@@ -1,7 +1,5 @@
 from flask import Flask
-from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.exc import IntegrityError, PendingRollbackError
 from os import path
 
 db = SQLAlchemy()
@@ -24,21 +22,8 @@ def create_app():
 
     from .models import Player, Game
     if not path.exists('app/' + DB_NAME):
-        print("created database!")
         with app.app_context():
             db.create_all()
-            # db.drop_all()
-
-            # https://stackoverflow.com/questions/52075642/how-to-handle-unique-data-in-sqlalchemy-flask-python
-            try:
-                db.session.add(Player("kman"))
-                db.session.commit()
-            except IntegrityError:
-                db.session.rollback()
-    
-            users = Player.query.all()
-            print(users)
-    # migrate = Migrate(app, db)
     return app
 
 
