@@ -29,18 +29,4 @@
     transition-duration: 0.4s;
     cursor: pointer;
   }
-
-
-/* .button1 {
-    background-color: white; 
-
-  } */
-
-  /* .button1.p {
-    color: yellow; 
-
-  } */
   
-  .button1:hover {
-    background-color: #ffffff;
-  }
