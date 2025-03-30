@@ -28,77 +28,6 @@ function CreateElement({name, id, classList, innerHTML=null})
     return newElement;
 }
 
-class BootStrapCard
-{
-    constructor ({id, header, body, title, text, footer})
-    {
-        this.cardContainer = CreateElement({name: "div", id: id, classList: ["card", "bg-light", "mb-3"]});
-
-        this.cardHeader = CreateElement({
-            name: "h1",
-            classList: "card-header",
-            innerHTML: header
-        });
-
-        this.cardBody = CreateElement({
-            name: "div",
-            classList: "card-body",
-            innerHTML: body
-        });
-
-        this.cardTitle = CreateElement({
-            name: "h5",
-            classList: "card-title",
-            innerHTML: title
-        });
-
-
-        this.cardText = CreateElement({
-            name: "p",
-            classList: "card-text",
-            innerHTML: text
-        });
-
-        this.cardFooter = CreateElement({
-            name: "div",
-            classList: "card-footer",
-            innerHTML: footer
-        });
-
-        
-        this.cardBody.appendChild(this.cardTitle);
-        this.cardBody.appendChild(this.cardText);
-
-
-        this.cardContainer.appendChild(this.cardHeader);
-
-        this.cardContainer.appendChild(this.cardBody);
-        this.cardContainer.appendChild(this.cardFooter);
-
-    }
-
-    updateHeader(content)
-    {
-        this.cardHeader.innerHTML = content;
-    }
-
-    updateBody(content)
-    {
-        this.cardBody.innerHTML = content;
-    }
-
-    updateTitle(content)
-    {
-        this.cardTitle.innerHTML = content;
-    }
-
-    updateText(content)
-    {
-        this.cardText.innerHTML = content;
-    }
-}
-
-
 
 class Game
 {
@@ -111,6 +40,7 @@ class Game
 
         this.element = this.buildUI();
         this.hasGameStarted = false;
+        this.rollValue = 0;
 
     }
 
@@ -125,13 +55,13 @@ class Game
 
         let elementRow = CreateElement({
             name: "div",
-            classList : "row"
+            classList : ["row", "justify-content-md-center"]
         });
         
         this.leftContainer = CreateElement({
             name: "div",
             id: "gub",
-            classList : "col-sm-6"
+            classList : ["col-sm-6"]
         })
 
         this.leftCard = new BootStrapCard({
@@ -210,8 +140,25 @@ class Game
         this.leftCard.cardTitle.appendChild(player.element);
     }
 
+    submitRoll()
+    {
+        if(this.rollValue < 1){return;}
+         // Send roll to backend
+         fetch("/api/submit", {
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json",
+            },
+            body: JSON.stringify({value : this.rollValue}),
+        })
+        .then(response => response.json())
+        .then(data => console.log("Success:", data))
+        .catch(error => console.error("Error:", error));
+    }
+
     nextMove()
     {
+        // Do nothing if no player
         if(this.players.length < 1){return;}
         if(!this.hasGameStarted)
         {
@@ -222,6 +169,9 @@ class Game
 
             this.gameUI();
         }
+
+        this.submitRoll();
+       
         // Mark game as started
         this.hasGameStarted = true;
 
@@ -243,6 +193,35 @@ class Game
         // Update headers
         this.leftCard.updateHeader("Active Player");
         this.rightCard.updateHeader("Player Stats");
+
+        let numberBar = CreateElement({
+            name: "div",
+            classList: ["btn-toolbar"]
+        })
+
+        let numberGroup = CreateElement({
+            name: "div",
+            classList: ["btn-group", "mr-2", "d-flex" ,"flex-wrap"]
+        })
+
+        for(let i = 1; i < 13; i++)
+        {
+            let numberBtn = CreateElement({
+                name: "button",
+                classList: ["btn", "btn-dark"],
+                innerHTML: `${i}`
+            })
+
+            numberBtn.onmousedown = () => {
+                this.rollValue = i;
+            };
+
+            numberGroup.appendChild(numberBtn)
+        }
+
+        numberBar.appendChild(numberGroup);
+
+        this.leftCard.cardFooter.appendChild(numberBar);
     }
 
     gameUpdateRightCard(player)
@@ -257,7 +236,6 @@ class Game
             `hello<br>`
         );
         this.leftCard.cardTitle.appendChild(player.element);
-
     }
 
 

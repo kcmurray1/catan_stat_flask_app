@@ -1,15 +1,11 @@
 .history-container {
-    background-color: red;
+    background-color: rgb(228, 100, 68);
     border-radius: 5px;
 }
 
-#game {
-    background-color: rgb(243, 243, 243);
-    border-radius: 5px;
-}
 
 .left-page-container {
-    background-color: aqua;
+    background-color: rgb(240, 48, 0);
     border-radius: 5px;
 }
 

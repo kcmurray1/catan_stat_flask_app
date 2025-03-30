@@ -8,22 +8,23 @@
 
 {%block scripts%}
 <script type="text/javascript" src="{{ url_for('static', filename='js/index.js') }}"></script>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-card.js') }}"></script>
 {%endblock%}
 {% block content %}
-<div class="row">
-  <div class="col-sm-3 left-page">
-    <div class="left-page-container">
-      <h1>Today</h1>
-    </div>
-    
-  </div>
 
-  <div class="col-sm-9" id="man">
-    <div class="history-container" id="history-container">
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12 col-md-4">
+      <div class="left-page-container">
+        <h1>Today</h1>
+      </div>
+      
+    </div>
+    <div class="col-12 col-md-8 history-container" id="man">
       <header>
         <h1>{{ today  }}</h1>
       </header>
-
       <div class="row stats">
         <ul>
           {% for person in people %}
@@ -38,11 +39,10 @@
           {% endfor %}
         </ul>
       </div>
+
+
     </div>
-
-    <!-- https://www.w3schools.com/tags/tag_button.asp -->
-
-
   </div>
 </div>
+
 {% endblock%}

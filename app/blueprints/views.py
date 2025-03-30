@@ -12,6 +12,7 @@ def view_home():
     current_date = date.today()
 
     return render_template("index.html", people=Player.query.all(), today=current_date.strftime("%m/%d/%Y"))
+    # return render_template("test.html")
 
 @view_bp.route('/add-player')
 def add_player():
