@@ -23,9 +23,6 @@ def add_player():
 
 @view_bp.route('/remove-player')
 def remove_player():
-
-
-    
     # p = Player.query.get()
     # if p:
     #     db = get_db()

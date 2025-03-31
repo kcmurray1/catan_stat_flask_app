@@ -28,6 +28,30 @@ function CreateElement({name, id, classList, innerHTML=null})
     return newElement;
 }
 
+async function FetchFromAPI({route, method, body=null}) {
+    try {
+        const response = await fetch(
+            route, {
+            method: method,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data; // Return the fetched data
+    } catch (error) {
+        console.error("Error:", error);
+        throw error; // Propagate the error if needed
+    }
+}
+
+
 
 class Game
 {
@@ -93,15 +117,15 @@ class Game
             header: "Selected Player",
             
         })
-        let nextButton =  CreateElement({
+        this.gameButton =  CreateElement({
             name: "button",
             id: "button",
             classList: ["btn" ,"btn-dark"],
-            innerHTML: "Next"
+            innerHTML: "Start"
         })
-        nextButton.onmousedown = () => {this.nextMove()};
+        this.gameButton.onmousedown = () => {this.start()};
         this.rightCard.cardFooter.appendChild(
-            nextButton
+            this.gameButton
         );
        
 
@@ -140,51 +164,58 @@ class Game
         this.leftCard.cardTitle.appendChild(player.element);
     }
 
-    submitRoll()
+    submitRoll(player)
     {
         if(this.rollValue < 1){return;}
          // Send roll to backend
-         fetch("/api/submit", {
+
+        FetchFromAPI({
+            route: `/api/submit-roll/${player.element.id}`, 
             method: "POST",
-            headers: {
-            "Content-Type": "application/json",
-            },
-            body: JSON.stringify({value : this.rollValue}),
+            body: {roll : this.rollValue}
         })
-        .then(response => response.json())
-        .then(data => console.log("Success:", data))
-        .catch(error => console.error("Error:", error));
+         .catch(error => console.error("Could not reteive Player: ", error))
     }
 
-    nextMove()
+    start()
     {
-        // Do nothing if no player
         if(this.players.length < 1){return;}
-        if(!this.hasGameStarted)
-        {
-            for(let player of this.players)
-            {
-                player.removeListeners();
-            }
 
-            this.gameUI();
+        let activePlayer = this.players[this.currentPlayer];
+
+        for(let player of this.players)
+        {
+            player.removeListeners();
         }
 
-        this.submitRoll();
-       
         // Mark game as started
         this.hasGameStarted = true;
-
-        // Update display for current Player
-        let activePlayer = this.players[this.currentPlayer];
+        this.gameUI();
         // left card displays the current player and is where user can enter information
         this.gameUpdateLeftCard(activePlayer);
         // right card displays current stats
         this.gameUpdateRightCard(activePlayer);
-        
 
-        // Update player index
+        
+        this.gameButton.onmousedown = () => {this.nextMove()};
+        this.gameButton.innerHTML = "Submit";   
+        
+    }
+    nextMove()
+    {
+        // Do nothing if no player
+        if(this.players.length < 1){return;}
+        let activePlayer = this.players[this.currentPlayer];
+
+
+        this.submitRoll(activePlayer);
+        // Move to next player
         this.currentPlayer = (this.currentPlayer + 1) % this.players.length;
+        activePlayer = this.players[this.currentPlayer];
+        // left card displays the current player and is where user can enter information
+        this.gameUpdateLeftCard(activePlayer);
+        // right card displays current stats
+        this.gameUpdateRightCard(activePlayer);
     }
 
 
@@ -224,10 +255,18 @@ class Game
         this.leftCard.cardFooter.appendChild(numberBar);
     }
 
+
     gameUpdateRightCard(player)
     {
-        this.rightCard.cardTitle.replaceChildren(player.element.id);
-
+        FetchFromAPI({
+            route: `/api/player/${player.element.id}`, 
+            method: "POST"
+        })
+            .then(data => {
+                this.rightCard.cardTitle.replaceChildren(new MyBarChart(data).canvas);
+            })
+            .catch(error => console.error("Could not reteive Player: ", error))
+      
     }
 
     gameUpdateLeftCard(player)
@@ -235,7 +274,7 @@ class Game
         this.leftCard.updateTitle(
             `hello<br>`
         );
-        this.leftCard.cardTitle.appendChild(player.element);
+        this.leftCard.cardTitle.replaceChildren(player.element);
     }
 
 
