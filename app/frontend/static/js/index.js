@@ -166,9 +166,6 @@ class Game
 
     submitRoll(player)
     {
-        if(this.rollValue < 1){return;}
-         // Send roll to backend
-
         FetchFromAPI({
             route: `/api/submit-roll/${player.element.id}`, 
             method: "POST",
@@ -182,11 +179,19 @@ class Game
         if(this.players.length < 1){return;}
 
         let activePlayer = this.players[this.currentPlayer];
-
+        let player_info = []
         for(let player of this.players)
         {
             player.removeListeners();
+            player_info.push(player.element.id)
         }
+        // Create Game in backend
+        FetchFromAPI({
+            route: "/api/create-game", 
+            method: "POST",
+            body: {"players" : player_info}
+        })
+        .catch(error => console.error("Could not reteive Player: ", error))
 
         // Mark game as started
         this.hasGameStarted = true;
@@ -207,8 +212,10 @@ class Game
         if(this.players.length < 1){return;}
         let activePlayer = this.players[this.currentPlayer];
 
-
+        if(this.rollValue < 1){return;}
+        // Send roll to backend
         this.submitRoll(activePlayer);
+        this.rollValue = null;
         // Move to next player
         this.currentPlayer = (this.currentPlayer + 1) % this.players.length;
         activePlayer = this.players[this.currentPlayer];
@@ -290,7 +297,7 @@ class PlayerButton
             name: "button",
             id: `${color}-button`,
             classList: ["button", "button1"]
-        })
+        }) 
 
         this.element.style.backgroundColor = `${color}`;
         this.element.style.color = "white";
