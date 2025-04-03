@@ -11,14 +11,13 @@ view_bp = Blueprint('/',__name__,  url_prefix='/')
 def view_home():
     current_date = date.today()
 
-    
-    # Create a new game
-    # new_game = Game()
-    # add_db_item(new_game)
+    db = get_db()
 
+    g = db.session.scalar(select(Game.game_id).order_by(Game.date.desc()))
+
+    print("recent game", g)
 
     return render_template("index.html", people=Player.query.all(), today=current_date.strftime("%m/%d/%Y"))
-    # return render_template("test.html")
 
 @view_bp.route('/add-player/<name>')
 def add_player(name):

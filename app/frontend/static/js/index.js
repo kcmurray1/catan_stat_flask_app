@@ -266,7 +266,7 @@ class Game
     gameUpdateRightCard(player)
     {
         FetchFromAPI({
-            route: `/api/player/${player.element.id}`, 
+            route: `/api/player/current-game/${player.element.id}`, 
             method: "POST"
         })
             .then(data => {
