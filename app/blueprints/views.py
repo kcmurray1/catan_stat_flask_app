@@ -17,7 +17,7 @@ def view_home():
 
     print("recent game", g)
 
-    return render_template("index.html", people=Player.query.all(), today=current_date.strftime("%m/%d/%Y"))
+    return render_template("index.html", people=Player.query.all(), game_history= Game.query.all() ,today=current_date.strftime("%m/%d/%Y"))
 
 @view_bp.route('/add-player/<name>')
 def add_player(name):

@@ -6,11 +6,58 @@ document.addEventListener("DOMContentLoaded", function()
     var game = new Game()
 });
 
+class GameCard
+{
+    
+    constructor(title, gameID)
+    {
+        this.gameID = gameID;
+        this.link = `list-${this.gameID}`
+        // <a class="list-group-item list-group-item-action" id="list-profile-list" data-toggle="list" href="#list-profile" role="tab" aria-controls="profile">Profile</a>
+        this.card = CreateElement({
+            name: "a",
+            id: `list-${this.gameID}-list`,
+            classList: ["list-group-item", "list-group-item-action"],
+            innerHTML: title
+        });
+        // this.card.onclick = () => {
+        //     this.getGameData()
+        // }
+        this.card.setAttribute("data-toggle", "list");
+        this.card.href = `#${this.link}`;
+   
+        this.card.setAttribute("role", "tab");
+        this.card.setAttribute("aria-controls", this.gameID)
+
+        
+        // <div class="tab-pane fade" id="list-profile" role="tabpanel" aria-labelledby="list-profile-list">something else</div>
+        this.content = CreateElement({
+            name: "div",
+            id: this.link,
+            classList: ["tab-pane" ,"fade"],
+            innerHTML : `Hello ${this.gameID}` 
+        })
+        this.content.setAttribute("role", "tabpanel")
+        this.content.setAttribute("aria-labelledby", this.card.id)
+
+       
+    
+    }
+
+    getGameData()
+    {
+        FetchFromAPI({
+            route: `/api/game-data/${this.gameID}`, 
+            method: "POST",
+        })
+         .catch(error => console.error("Could not retrieve Game: ", error))
+    }
+}
+
 function CreateElement({name, id, classList, innerHTML=null})
 {
     let newElement = document.createElement(name);
 
-    newElement.id = id;
     if (classList instanceof Array)
     {
         for(let className of classList)
@@ -20,6 +67,9 @@ function CreateElement({name, id, classList, innerHTML=null})
     {
         newElement.classList.add(classList);
     }
+
+    newElement.id = id;
+   
         
 
     if(innerHTML)
@@ -138,7 +188,7 @@ class Game
         elementRow.appendChild(this.rightContainer);
         element.appendChild(elementRow);
 
-        let idk = document.getElementById("man");
+        let idk = document.getElementById("list-home");
 
         if(idk)
             idk.appendChild(element);

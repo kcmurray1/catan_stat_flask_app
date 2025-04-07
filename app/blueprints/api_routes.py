@@ -5,9 +5,21 @@ from sqlalchemy import select, update
 import random
 api_bp = Blueprint('api', __name__)
 
-@api_bp.route('/api-home')
+@api_bp.route('/api-status')
 def api_home():
-    return make_response({"result": "Welcome"}, 200)
+    return make_response({"result": "Success!"}, 200)
+
+@api_bp.route('/game-data/<id>', methods=["POST"])
+def get_game_data(id):
+    db = get_db()
+
+    game_data = db.session.execute(select(game_player).where(game_player.c.game_id == id)).mappings().first()
+
+    if not game_data:
+        return make_response({"error": "Game not found"}, 404)
+    
+    print(game_data)
+    return make_response({"result": "Got GAME"}, 201)
 
 # update database with roll for player
 @api_bp.route('/submit-roll/<user>', methods=['POST'])
@@ -64,7 +76,7 @@ def create_game():
     return make_response({"result": "Success"}, 201)
 
 
-
+#FIXME: Unimplemented
 # Retrieve ALL player information such as Games played, wins, overall roll frequency etc.
 @api_bp.route('/player/<ID>', methods=["POST"])
 def get_player_info(ID):
