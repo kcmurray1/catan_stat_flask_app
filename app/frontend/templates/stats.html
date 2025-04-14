@@ -8,41 +8,42 @@
 {%block scripts%}
 
 <script type="text/javascript" src="{{ url_for('static', filename='js/player-card.js') }}"></script>
+ 
 
-{%endblock%}
+
+{% endblock %}
 {% block content %}
 <div class="list-group" id="list-tab" role="tablist">
-    <a class="list-group-item list-group-item-action active" id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="home">Today</a>
+
 </div>
        
-    
-</div>
+  
 <div class="col-12 col-md-8 player-stats-container" id="man">
 
 <div class="tab-content" id="nav-tabContent">
     <div class="tab-pane fade show active" id="list-home" role="tabpanel" aria-labelledby="list-home-list">
-    <header>
+      <header>
         <h1>{{ today  }}</h1>
-    </header>
+      </header>
     </div>
 </div>
-  <div class="row stats">
-        <ul>
-          {% for person in people %}
 
-          <script>
-          
-            newCard = new PlayerCard("{{person.first_name}}", "{{person.player_id}}");
-            leftPage = document.getElementById("list-tab");
-            leftPage.appendChild(newCard.tab);
-    
-            rightPage = document.getElementById("nav-tabContent");
-    
-            rightPage.appendChild(newCard.content)
-            
-          </script>
-          {% endfor %}
-        </ul>
-      </div>
+<div class="row stats">
+    <ul>
+      {% for person in people %}
+      <script>
+      
+        newCard = new PlayerCard("{{person.first_name}}", "{{person.player_id}}");
+        leftPage = document.getElementById("list-tab");
+        leftPage.appendChild(newCard.tab);
+
+        rightPage = document.getElementById("nav-tabContent");
+
+        rightPage.appendChild(newCard.content)
+        
+      </script>
+      {% endfor %}
+    </ul>
+  </div>
 
 {% endblock%}

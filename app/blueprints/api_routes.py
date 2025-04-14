@@ -107,22 +107,28 @@ def create_game():
 
 #FIXME: Unimplemented
 # Retrieve ALL player information such as Games played, wins, overall roll frequency etc.
-@api_bp.route('/player/<ID>', methods=["POST"])
-def get_player_info(ID):
+@api_bp.route('/player/<username>', methods=["POST"])
+def get_player_info(username):
     db = get_db()
 
-    res = db.session.execute(select(game_player).where(game_player.c.player_id == 1)).mappings().first()
 
+    # Get all games played
+    res = db.session.execute(select(Player).where(Player.first_name == username)).one_or_none()
+
+    payload = {"result" : "player not found"}
+   
     if not res:
-        return {}
-    test = {}
-    for key,val in zip(res.keys(), res.values()):
-        if(key != "player_id" and key != "game_id"):
-            key = key.split('_')[-1]
-            test[key] = val
+        return make_response(payload, 404)
+    
+    payload["result"] = "success"
+    
 
+    for player in res:
+        payload["player_data"] = player.to_json()
+  
+    
 
-    return test
+    return make_response(payload, 203)
 
 @api_bp.route('/player/<game_id>/<player>', methods=["POST"])
 def get_player(game_id, player):

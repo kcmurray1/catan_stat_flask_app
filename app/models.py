@@ -38,7 +38,7 @@ class Player(db.Model):
         return f"{self.first_name}"
     
     def to_json(self):
-        return {"id" : self.id, "name": self.first_name}
+        return {"id" : self.player_id, "name": self.first_name, "games_played" : [game.to_json() for game in self.games_played]}
 
 
 
@@ -49,6 +49,9 @@ class Game(db.Model):
 
     def __repr__(self):
         return f'<Game: {self.date}>'
+    
+    def to_json(self):
+        return {"date": self.date, "id" : self.game_id}
 
 
 class ModelUtils:

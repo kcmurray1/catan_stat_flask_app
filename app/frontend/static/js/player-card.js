@@ -1,24 +1,3 @@
-function CreateElement({name, id, classList, innerHTML=null})
-{
-    let newElement = document.createElement(name);
-
-    if (classList instanceof Array)
-    {
-        for(let className of classList)
-            newElement.classList.add(className);
-    }
-    else
-    {
-        newElement.classList.add(classList);
-    }
-
-    newElement.id = id;
-
-    if(innerHTML)
-        newElement.innerHTML = innerHTML;
-
-    return newElement;
-}
 class PlayerCard
 {
     
@@ -26,6 +5,7 @@ class PlayerCard
     {
     this.gameID = playerID;
     this.link = `list-${this.gameID}`
+    this.username = playerName;
 
     this.tab = CreateElement({
         name: "a",
@@ -55,6 +35,13 @@ class PlayerCard
 
     getPlayerData()
     {
-
+        FetchFromAPI({
+            route: `api/player/${this.username}`,
+            method: "POST"
+        })
+        .then(data => {
+            this.content.replaceChildren(JSON.stringify(data["player_data"]));
+        })
+        .catch(error => console.error("Could not retrieve Player: ", error))
     }
 }
