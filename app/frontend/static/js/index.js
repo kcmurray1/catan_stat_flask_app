@@ -13,24 +13,23 @@ class GameCard
     {
         this.gameID = gameID;
         this.link = `list-${this.gameID}`
-        // <a class="list-group-item list-group-item-action" id="list-profile-list" data-toggle="list" href="#list-profile" role="tab" aria-controls="profile">Profile</a>
-        this.card = CreateElement({
+
+        this.tab = CreateElement({
             name: "a",
             id: `list-${this.gameID}-list`,
             classList: ["list-group-item", "list-group-item-action"],
             innerHTML: title
         });
-        // this.card.onclick = () => {
-        //     this.getGameData()
-        // }
-        this.card.setAttribute("data-toggle", "list");
-        this.card.href = `#${this.link}`;
+        this.tab.onclick = () => {
+            this.getGameData()
+        }
+        this.tab.setAttribute("data-toggle", "list");
+        this.tab.href = `#${this.link}`;
    
-        this.card.setAttribute("role", "tab");
-        this.card.setAttribute("aria-controls", this.gameID)
+        this.tab.setAttribute("role", "tab");
+        this.tab.setAttribute("aria-controls", this.gameID)
 
-        
-        // <div class="tab-pane fade" id="list-profile" role="tabpanel" aria-labelledby="list-profile-list">something else</div>
+    
         this.content = CreateElement({
             name: "div",
             id: this.link,
@@ -38,7 +37,7 @@ class GameCard
             innerHTML : `Hello ${this.gameID}` 
         })
         this.content.setAttribute("role", "tabpanel")
-        this.content.setAttribute("aria-labelledby", this.card.id)
+        this.content.setAttribute("aria-labelledby", this.tab.id)
 
        
     
@@ -50,7 +49,40 @@ class GameCard
             route: `/api/game-data/${this.gameID}`, 
             method: "POST",
         })
-         .catch(error => console.error("Could not retrieve Game: ", error))
+        .then(data => {
+            this.content.replaceChildren()
+        
+            // Object deconstructing
+            let {rolls: playerRolls, players: players} = data["data"]
+            let afk = new BootStrapCard({
+                title: "<h1>Total</h1>",
+            })
+            afk.cardBody.appendChild(new MyBarChart(playerRolls).canvas)
+            for(let player of players)
+            {
+           
+                let gub = CreateElement({
+                    name: "button",
+                    id: `${player}-button`,
+                    classList: ["button", "button1"],
+                    innerHTML: `${player}`
+                }) 
+                gub.style.color = "black";
+                gub.onmousedown = () => {
+                    FetchFromAPI({
+                        route: `/api/player/current-game/${player}`, 
+                        method: "POST"
+                    })
+                        .then(data => {
+                            this.rightCard.cardTitle.replaceChildren(new MyBarChart(data).canvas);
+                        })
+                        .catch(error => console.error("Could not reteive Player: ", error))
+                }
+                afk.cardBody.appendChild(gub);
+            }
+            this.content.appendChild(afk.cardContainer)
+        })
+        .catch(error => console.error("Could not retrieve Game: ", error))
     }
 }
 

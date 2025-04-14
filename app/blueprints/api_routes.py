@@ -1,7 +1,7 @@
 from flask import Blueprint, make_response, request
 from app.utils.db_utils import get_db, add_db_item
 from app.models import Player, Game, game_player
-from sqlalchemy import select, update
+from sqlalchemy import select, update, func
 import random
 api_bp = Blueprint('api', __name__)
 
@@ -13,13 +13,56 @@ def api_home():
 def get_game_data(id):
     db = get_db()
 
-    game_data = db.session.execute(select(game_player).where(game_player.c.game_id == id)).mappings().first()
+
+    all_count_columns = sum(func.sum(game_player.c[f"roll_count_{i}"]) for i in range(2,13))
+
+    individual_sums = [func.sum(game_player.c[f"roll_count_{i}"]) for i in range(2,13)]
+
+    
+    total_roll_counts = db.session.execute(
+        select(*individual_sums)
+        .where(game_player.c.game_id == id)
+        .where(game_player.c.player_id == Player.player_id)
+    ).one()
+    print(Game.query.get(id).players)
+    print(total_roll_counts)
+
+    column_names = [i for i in range(2, 13)]
+
+
+
+    # 
+
+    game_data = db.session.execute(
+        select(game_player, Player.first_name)
+        .where(game_player.c.game_id == id)
+        .where(game_player.c.player_id == Player.player_id)
+    ).mappings()
+
+    payload = dict()
+    payload["rolls"] = {}
+    payload["players"] = [x.first_name for x in Game.query.get(id).players]
+    
+    for key, val in zip(column_names, total_roll_counts):
+        payload["rolls"][key] = val 
+   
+    # for i in game_data:
+    #     mini = {}
+    #     mini["rolls"] = {}
+
+    #     for key, val in zip(i.keys(), i.values()):
+    #         if key == "first_name":
+    #             mini[key] = val
+    #         if(key != "player_id" and key != "game_id" and key != "first_name"):
+    #             key = key.split('_')[-1]
+    #             mini["rolls"][key] = val
+    #     payload.append(mini)
+
 
     if not game_data:
         return make_response({"error": "Game not found"}, 404)
-    
-    print(game_data)
-    return make_response({"result": "Got GAME"}, 201)
+
+    return make_response({"result": "success", "data" : payload}, 201)
 
 # update database with roll for player
 @api_bp.route('/submit-roll/<user>', methods=['POST'])

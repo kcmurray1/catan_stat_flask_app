@@ -12,33 +12,10 @@ def view_home():
     current_date = date.today()
 
     db = get_db()
-
-    g = db.session.scalar(select(Game.game_id).order_by(Game.date.desc()))
-
-    print("recent game", g)
-
-    return render_template("index.html", people=Player.query.all(), game_history= Game.query.all() ,today=current_date.strftime("%m/%d/%Y"))
-
-@view_bp.route('/add-player/<name>')
-def add_player(name):
-    db = get_db()
-    # Create new Player
-    # p = Player(first_name=name)
-    p = db.session.scalar(select(Player).where(Player.first_name== "Obama"))
-
-    p.first_name = name
-    # add_db_item(p)
-   
-    # add player to current game
-    # p.games_played.append(
-        # db.session.scalar(select(Game).where(Game.game_id == 1))
-    # )
-
-    db.session.commit()
-  
     
-    
-    return f"""Added awd to database {str(Player.query.all())}"""
+    all_games = db.session.execute(select(Game).order_by(Game.date.desc())).mappings().all()
+
+    return render_template("index.html", people=Player.query.all(), game_history= [game["Game"] for game in all_games] ,today=current_date.strftime("%m/%d/%Y"))
 
 
 @view_bp.route('/remove-player')
