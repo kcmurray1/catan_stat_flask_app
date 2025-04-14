@@ -1,6 +1,6 @@
 from flask import Blueprint, make_response, request
 from app.utils.db_utils import get_db, add_db_item
-from app.models import Player, Game, game_player
+from app.models import Player, Game, game_player, ModelUtils
 from sqlalchemy import select, update, func
 import random
 api_bp = Blueprint('api', __name__)
@@ -29,15 +29,13 @@ def get_game_data(id):
 
     column_names = [i for i in range(2, 13)]
 
-
-
-    # 
-
     game_data = db.session.execute(
         select(game_player, Player.first_name)
         .where(game_player.c.game_id == id)
         .where(game_player.c.player_id == Player.player_id)
     ).mappings()
+
+
 
     payload = dict()
     payload["rolls"] = {}
@@ -45,18 +43,6 @@ def get_game_data(id):
     
     for key, val in zip(column_names, total_roll_counts):
         payload["rolls"][key] = val 
-   
-    # for i in game_data:
-    #     mini = {}
-    #     mini["rolls"] = {}
-
-    #     for key, val in zip(i.keys(), i.values()):
-    #         if key == "first_name":
-    #             mini[key] = val
-    #         if(key != "player_id" and key != "game_id" and key != "first_name"):
-    #             key = key.split('_')[-1]
-    #             mini["rolls"][key] = val
-    #     payload.append(mini)
 
 
     if not game_data:
@@ -137,6 +123,27 @@ def get_player_info(ID):
 
 
     return test
+
+@api_bp.route('/player/<game_id>/<player>', methods=["POST"])
+def get_player(game_id, player):
+    payload = dict()
+
+    db = get_db()
+
+    player_rolls = db.session.execute(
+        select(*ModelUtils.allCounts())
+        .where(
+            game_player.c.player_id == select(Player.player_id).where(Player.first_name == player).scalar_subquery()
+        )
+        .where(game_player.c.game_id == game_id)
+    ).one_or_none()
+    if not player_rolls:
+        return make_response({"result": "player not found"}, 404)
+    
+    for key, val in zip(ModelUtils.CountColumnNames(), player_rolls):
+        payload[key] = val 
+
+    return make_response({"result": "Success", "data" : payload}, 201)
 
 # Get player roll information for current game
 @api_bp.route('/player/current-game/<player>', methods=["POST"])

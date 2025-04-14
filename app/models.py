@@ -51,3 +51,8 @@ class Game(db.Model):
         return f'<Game: {self.date}>'
 
 
+class ModelUtils:
+    def CountColumnNames(column_name=None):
+        return [column_name if column_name else i for i in range(2,13)]
+    def allCounts():
+        return [game_player.c[f"roll_count_{i}"] for i in range(2,13)]

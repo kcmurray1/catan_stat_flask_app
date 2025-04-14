@@ -47,6 +47,15 @@ class BootStrapCard
 
     }
 
+    clearCard()
+    {
+        this.cardFooter.replaceChildren();
+        this.cardBody.replaceChildren();
+        this.cardFooter.replaceChildren();
+        this.cardText.replaceChildren();
+        this.cardTitle.replaceChildren();
+    }
+
     updateHeader(content)
     {
         this.cardHeader.innerHTML = content;

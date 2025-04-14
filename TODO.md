@@ -6,10 +6,10 @@ FUNCTIONS
     - individual roll frequencies [x]
     Game
     - date [x]
-    - winner
-    - total roll frequencies(all of players roll frequencies)
+    - winner **TODO**
+    - total roll frequencies(all of players roll frequencies) [x]
 
-2 - interact with player information
+2 - interact with player information **NEXT**
     Player
     - Game history
     - individual performance (refer to 1-Players above)

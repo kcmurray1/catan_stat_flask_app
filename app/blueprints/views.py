@@ -33,6 +33,8 @@ def stats():
     for player in items:
         print(player.first_name)
     game = Game.query.first()
-    print(game.players)
-    # NOTE: redirect to another template follows <name>.<function_name>
-    return redirect(url_for("api.api_home"))
+
+    return render_template("stats.html",  people=Player.query.all())
+    # print(game.players)
+    # # NOTE: redirect to another template follows <name>.<function_name>
+    # return redirect(url_for("api.api_home"))

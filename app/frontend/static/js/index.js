@@ -6,6 +6,22 @@ document.addEventListener("DOMContentLoaded", function()
     var game = new Game()
 });
 
+
+class BasicButton
+{
+    constructor({innerHTML=null})
+    {
+        this.element = CreateElement({
+            name: "button",
+            id: `${innerHTML}-button`,
+            classList: ["button", "button1"],
+            innerHTML: innerHTML
+        });
+        this.element.style.color = "black";
+
+    }
+}
+
 class GameCard
 {
     
@@ -39,48 +55,75 @@ class GameCard
         this.content.setAttribute("role", "tabpanel")
         this.content.setAttribute("aria-labelledby", this.tab.id)
 
-       
+        this.rollChartCard = new BootStrapCard({
+            title: "<h1>Total</h1>",
+        });
     
     }
 
-    getGameData()
+    updateRollChart(newChart)
     {
+        this.rollChartCard.cardBody.replaceChildren(newChart.canvas);
+    }
+    
+
+    showAllData()
+    {
+        // Create area to display chart
         FetchFromAPI({
             route: `/api/game-data/${this.gameID}`, 
             method: "POST",
         })
         .then(data => {
-            this.content.replaceChildren()
+            let {rolls: playerRolls, players: _} = data["data"]
+            this.rollChartCard.cardBody.replaceChildren(new MyBarChart(playerRolls).canvas)
+        })
+        .catch(error => console.error("Could not retrieve Game: ", error))
+
+    }
+
+    getGameData()
+    {
         
+        FetchFromAPI({
+            route: `/api/game-data/${this.gameID}`, 
+            method: "POST",
+        })
+        .then(data => {
+            this.content.replaceChildren();
+            this.rollChartCard.clearCard();
+            let allButton = new BasicButton({
+                innerHTML: "All",
+            });
+            allButton.element.onmousedown = () => {
+                this.showAllData();
+            }
+            this.rollChartCard.cardFooter.appendChild(allButton.element)
             // Object deconstructing
             let {rolls: playerRolls, players: players} = data["data"]
-            let afk = new BootStrapCard({
-                title: "<h1>Total</h1>",
-            })
-            afk.cardBody.appendChild(new MyBarChart(playerRolls).canvas)
+           
+            this.updateRollChart(new MyBarChart(playerRolls))
             for(let player of players)
             {
            
-                let gub = CreateElement({
-                    name: "button",
-                    id: `${player}-button`,
-                    classList: ["button", "button1"],
-                    innerHTML: `${player}`
-                }) 
-                gub.style.color = "black";
+                let gub = new BasicButton({
+                    innerHTML: player
+                }).element
                 gub.onmousedown = () => {
                     FetchFromAPI({
-                        route: `/api/player/current-game/${player}`, 
+                        route: `/api/player/${this.gameID}/${player}`, 
                         method: "POST"
                     })
-                        .then(data => {
-                            this.rightCard.cardTitle.replaceChildren(new MyBarChart(data).canvas);
-                        })
-                        .catch(error => console.error("Could not reteive Player: ", error))
+                    .then(data => {
+                        let roll_data = data["data"];
+                        this.updateRollChart(new MyBarChart(roll_data));
+                    })
+                    .catch(error => console.error("Could not reteive Player: ", error))
                 }
-                afk.cardBody.appendChild(gub);
+                // Create buttons for each player that display individual performance
+                this.rollChartCard.cardFooter.appendChild(gub);
             }
-            this.content.appendChild(afk.cardContainer)
+            this.content.appendChild(this.rollChartCard.cardContainer)
         })
         .catch(error => console.error("Could not retrieve Game: ", error))
     }
@@ -102,8 +145,6 @@ function CreateElement({name, id, classList, innerHTML=null})
 
     newElement.id = id;
    
-        
-
     if(innerHTML)
         newElement.innerHTML = innerHTML;
 
@@ -233,7 +274,6 @@ class Game
     addPlayer(player)
     {
         this.players.push(player);
-        // player.element.innerHTML = `<p>${this.players.findIndex(function(item){return item.element.id == player.element.id}) + 1}<p>`;
         this.rightCard.cardTitle.appendChild(player.element);
     }
 
@@ -324,7 +364,7 @@ class Game
             classList: ["btn-group", "mr-2", "d-flex" ,"flex-wrap"]
         })
 
-        for(let i = 1; i < 13; i++)
+        for(let i = 2; i < 13; i++)
         {
             let numberBtn = CreateElement({
                 name: "button",
