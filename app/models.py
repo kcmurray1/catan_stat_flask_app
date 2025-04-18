@@ -11,6 +11,7 @@ game_player = db.Table(
     "game_player",
     Column('player_id', Integer, ForeignKey('player.player_id')),
     Column('game_id', Integer, ForeignKey('game.game_id')),
+    Column('score', Integer, default=0),
     Column('roll_count_2', Integer, default=0),
     Column('roll_count_3', Integer, default=0),
     Column('roll_count_4', Integer, default=0),
@@ -57,5 +58,12 @@ class Game(db.Model):
 class ModelUtils:
     def CountColumnNames(column_name=None):
         return [column_name if column_name else i for i in range(2,13)]
+    
+    def game_player_columns():
+        x =  [i for i in range(2,13)] + ["score"]
+        print(x)
+        return [i for i in range(2,13)] + ["score"]
+    
     def allCounts():
         return [game_player.c[f"roll_count_{i}"] for i in range(2,13)]
+    

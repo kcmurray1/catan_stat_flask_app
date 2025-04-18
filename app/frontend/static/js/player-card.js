@@ -36,11 +36,11 @@ class PlayerCard
     getPlayerData()
     {
         FetchFromAPI({
-            route: `api/player/${this.username}`,
+            route: `players/${this.username}/`,
             method: "POST"
         })
         .then(data => {
-            this.content.replaceChildren(JSON.stringify(data["player_data"]));
+            this.content.replaceChildren(JSON.stringify(data["player"]));
         })
         .catch(error => console.error("Could not retrieve Player: ", error))
     }

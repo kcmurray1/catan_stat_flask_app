@@ -71,11 +71,11 @@ class GameCard
     {
         // Create area to display chart
         FetchFromAPI({
-            route: `/api/game-data/${this.gameID}`, 
+            route: `/games/${this.gameID}`, 
             method: "POST",
         })
         .then(data => {
-            let {rolls: playerRolls, players: _} = data["data"]
+            let {rolls: playerRolls, players: _} = data["game"]
             this.rollChartCard.cardBody.replaceChildren(new MyBarChart(playerRolls).canvas)
         })
         .catch(error => console.error("Could not retrieve Game: ", error))
@@ -86,7 +86,7 @@ class GameCard
     {
         
         FetchFromAPI({
-            route: `/api/game-data/${this.gameID}`, 
+            route: `/games/${this.gameID}`, 
             method: "POST",
         })
         .then(data => {
@@ -100,7 +100,7 @@ class GameCard
             }
             this.rollChartCard.cardFooter.appendChild(allButton.element)
             // Object deconstructing
-            let {rolls: playerRolls, players: players} = data["data"]
+            let {rolls: playerRolls, players: players} = data["game"]
            
             this.updateRollChart(new MyBarChart(playerRolls))
             for(let player of players)
@@ -111,11 +111,11 @@ class GameCard
                 }).element
                 gub.onmousedown = () => {
                     FetchFromAPI({
-                        route: `/api/player/${this.gameID}/${player}`, 
+                        route: `/players/${player}/${this.gameID}/rolls`, 
                         method: "POST"
                     })
                     .then(data => {
-                        let roll_data = data["data"];
+                        let roll_data = data["rolls"];
                         this.updateRollChart(new MyBarChart(roll_data));
                     })
                     .catch(error => console.error("Could not reteive Player: ", error))
@@ -165,6 +165,7 @@ class Game
         this.hasGameStarted = false;
         this.rollValue = 0;
 
+        this.gameID = null;
     }
 
     buildUI()
@@ -289,6 +290,11 @@ class Game
             method: "POST",
             body: {"players" : player_info}
         })
+        .then(data =>
+            {
+                this.gameID = data["game_id"] 
+            }
+        )
         .catch(error => console.error("Could not reteive Player: ", error))
 
         // Mark game as started
@@ -364,11 +370,12 @@ class Game
     gameUpdateRightCard(player)
     {
         FetchFromAPI({
-            route: `/api/player/current-game/${player.element.id}`, 
+            // route: `/api/player/current-game/${player.element.id}`, 
+            route: `/players/${player.element.id}/${this.gameID}/rolls`,
             method: "POST"
         })
             .then(data => {
-                this.rightCard.cardTitle.replaceChildren(new MyBarChart(data).canvas);
+                this.rightCard.cardTitle.replaceChildren(new MyBarChart(data["rolls"]).canvas);
             })
             .catch(error => console.error("Could not reteive Player: ", error))
       

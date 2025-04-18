@@ -14,11 +14,15 @@ def create_app():
 
     db.init_app(app)
 
-    from .blueprints.api_routes import api_bp
-    from .blueprints.views import view_bp
+    from .route_blueprints.api_routes import api_bp
+    from .route_blueprints.views import view_bp
+    from .route_blueprints.players import players_bp
+    from .route_blueprints.games import games_bp
 
     app.register_blueprint(api_bp, url_prefix='/api')
     app.register_blueprint(view_bp, url_prefix='/')
+    app.register_blueprint(players_bp, url_prefix='/players')
+    app.register_blueprint(games_bp, url_prefix='/games')
 
     from .models import Player, Game
     if not path.exists('app/' + DB_NAME):

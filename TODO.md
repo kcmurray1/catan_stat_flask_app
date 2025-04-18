@@ -29,8 +29,3 @@ UI
     - Make game history into scrollable list
 
 
-# NOTES:
-- adjusted game history to display the total roll count frequencies
-- display players as buttons
-    - onClick: display the individual rolls for the selected player
-
