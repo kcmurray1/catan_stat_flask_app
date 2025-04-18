@@ -16,6 +16,7 @@ class PlayerCard
     this.tab.onclick = () => {
         this.getPlayerData()
     }
+
     this.tab.setAttribute("data-toggle", "list");
     this.tab.href = `#${this.link}`;
 
@@ -40,8 +41,34 @@ class PlayerCard
             method: "GET"
         })
         .then(data => {
-            this.content.replaceChildren(JSON.stringify(data["player"]));
+            let {games_played: games, id: id, name: playerName} = data["player"];
+
+            console.log(playerName);
+
+            this.content.replaceChildren(
+                new PlayerDashboard(
+                    playerName,
+                    games
+                ).element
+        );
         })
         .catch(error => console.error("Could not retrieve Player: ", error))
+    }
+}
+
+// constructor ({id, header, body, title, text, footer})
+
+class PlayerDashboard
+{
+    constructor(playerName,games)
+    {
+        console.log(games)
+        this.card = new BootStrapCard({
+            id: `${playerName}-card`,
+            header: playerName,
+            body: JSON.stringify(games)
+        });
+
+        this.element = this.card.cardContainer
     }
 }
