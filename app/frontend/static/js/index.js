@@ -1,6 +1,5 @@
 const DEFAULT_COLORS = ["Blue", "Green", "Red", "Orange", "Brown", "White"]
 
-// Display 10 initial books
 document.addEventListener("DOMContentLoaded", function()
 {
     var game = new Game()
@@ -72,7 +71,7 @@ class GameCard
         // Create area to display chart
         FetchFromAPI({
             route: `/games/${this.gameID}`, 
-            method: "POST",
+            method: "GET",
         })
         .then(data => {
             let {rolls: playerRolls, players: _} = data["game"]
@@ -87,7 +86,7 @@ class GameCard
         
         FetchFromAPI({
             route: `/games/${this.gameID}`, 
-            method: "POST",
+            method: "GET",
         })
         .then(data => {
             this.content.replaceChildren();
@@ -112,7 +111,7 @@ class GameCard
                 gub.onmousedown = () => {
                     FetchFromAPI({
                         route: `/players/${player}/${this.gameID}/rolls`, 
-                        method: "POST"
+                        method: "GET"
                     })
                     .then(data => {
                         let roll_data = data["rolls"];
@@ -129,27 +128,7 @@ class GameCard
     }
 }
 
-function CreateElement({name, id, classList, innerHTML=null})
-{
-    let newElement = document.createElement(name);
 
-    if (classList instanceof Array)
-    {
-        for(let className of classList)
-            newElement.classList.add(className);
-    }
-    else
-    {
-        newElement.classList.add(classList);
-    }
-
-    newElement.id = id;
-   
-    if(innerHTML)
-        newElement.innerHTML = innerHTML;
-
-    return newElement;
-}
 
 
 class Game
@@ -217,17 +196,29 @@ class Game
             header: "Selected Player",
             
         })
-        this.gameButton =  CreateElement({
+        this.gameBtn =  CreateElement({
             name: "button",
             id: "button",
             classList: ["btn" ,"btn-dark"],
             innerHTML: "Start"
         })
-        this.gameButton.onmousedown = () => {this.start()};
+        this.gameBtn.onmousedown = () => {this.start()};
+
+        this.quitBtn = new BasicButton({
+            innerHTML: "Quit"
+        });
+
+
+        
+        this.quitBtn.element.onmousedown = () => {this.endGame()};
+
+
         this.rightCard.cardFooter.appendChild(
-            this.gameButton
+            this.gameBtn
         );
-       
+        
+        
+      
 
         this.rightContainer.appendChild(this.rightCard.cardContainer);
         
@@ -266,11 +257,17 @@ class Game
     submitRoll(player)
     {
         FetchFromAPI({
-            route: `/api/submit-roll/${player.element.id}`, 
+            route: `/games/add-roll/${player.element.id}`, 
             method: "POST",
             body: {roll : this.rollValue}
         })
          .catch(error => console.error("Could not reteive Player: ", error))
+    }
+
+    endGame()
+    {
+        const confirmEnd = window.confirm("Are you sure you want to end the game?");
+        if(confirmEnd){window.location.reload();}
     }
 
     start()
@@ -286,28 +283,34 @@ class Game
         }
         // Create Game in backend
         FetchFromAPI({
-            route: "/api/create-game", 
+            route: "/games/create", 
             method: "POST",
             body: {"players" : player_info}
         })
         .then(data =>
             {
                 this.gameID = data["game_id"] 
+
+                // Mark game as started
+                this.hasGameStarted = true;
+                this.gameUI();
+                // left card displays the current player and is where user can enter information
+                this.gameUpdateLeftCard(activePlayer);
+                // right card displays current stats
+                this.gameUpdateRightCard(activePlayer);
+
+                
+                this.gameBtn.onmousedown = () => {this.nextMove()};
+                this.gameBtn.innerHTML = "Submit";   
+
+                this.rightCard.cardFooter.appendChild(
+                    this.quitBtn.element
+                );
             }
         )
         .catch(error => console.error("Could not reteive Player: ", error))
 
-        // Mark game as started
-        this.hasGameStarted = true;
-        this.gameUI();
-        // left card displays the current player and is where user can enter information
-        this.gameUpdateLeftCard(activePlayer);
-        // right card displays current stats
-        this.gameUpdateRightCard(activePlayer);
-
-        
-        this.gameButton.onmousedown = () => {this.nextMove()};
-        this.gameButton.innerHTML = "Submit";   
+      
         
     }
     nextMove()
@@ -372,7 +375,7 @@ class Game
         FetchFromAPI({
             // route: `/api/player/current-game/${player.element.id}`, 
             route: `/players/${player.element.id}/${this.gameID}/rolls`,
-            method: "POST"
+            method: "GET"
         })
             .then(data => {
                 this.rightCard.cardTitle.replaceChildren(new MyBarChart(data["rolls"]).canvas);

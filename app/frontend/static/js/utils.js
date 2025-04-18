@@ -22,23 +22,53 @@ function CreateElement({name, id, classList, innerHTML=null})
 
 async function FetchFromAPI({route, method, body=null}) {
     try {
-        const response = await fetch(
-            route, {
-            method: method,
+
+        let newRequest = {
+            method,
             headers: {
                 "Content-Type": "application/json",
-            },
-            body: JSON.stringify(body),
-        });
+            }
+        };
+
+        if(method.toUpperCase() !== "GET" && body !== null)
+        {
+            console.log("adding body");
+            newRequest.body = JSON.stringify(body);
+        }
+
+        const response = await fetch(route, newRequest);
 
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            throw new Error(`API HTTP error! Status: ${response.status}`);
         }
 
         const data = await response.json();
         return data; // Return the fetched data
     } catch (error) {
         console.error("Error:", error);
-        throw error; // Propagate the error if needed
+        throw error;
     }
+}
+
+
+function CreateElement({name, id, classList, innerHTML=null})
+{
+    let newElement = document.createElement(name);
+
+    if (classList instanceof Array)
+    {
+        for(let className of classList)
+            newElement.classList.add(className);
+    }
+    else
+    {
+        newElement.classList.add(classList);
+    }
+
+    newElement.id = id;
+   
+    if(innerHTML)
+        newElement.innerHTML = innerHTML;
+
+    return newElement;
 }

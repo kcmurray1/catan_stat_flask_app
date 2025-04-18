@@ -21,7 +21,7 @@ def players_home():
     return make_response({"result" : "success", "players" : payload})
 
 # Get all information for specific player
-@players_bp.route('/<username>/', methods=["POST"])
+@players_bp.route('/<username>/')
 def player_data(username):
 
     player = get_player(username)
@@ -32,33 +32,35 @@ def player_data(username):
     return make_response({"result": "Success!", "player" : player.to_json()}, 200)
 
 # Get roll frequency from specific game
-@players_bp.route('/<username>/<game_id>/rolls', methods=["POST"])
+@players_bp.route('/<username>/<game_id>/rolls')
 def players_stats(username, game_id):
-
+    # Verify player exists
     player = get_player(username)
 
     if not player:
         return make_response({"error" : "Player not found"}, 404)
 
+    # retrieve roll counts
     db = get_db()
-
     player_stats = db.session.execute(
         select(*ModelUtils.allCounts())
         .where(game_player.c.player_id == player.player_id)
         .where(game_player.c.game_id == game_id)
     ).mappings().first()
 
+    # no rolls were recorded
     if not player_stats:
         return  {key.split("_")[-1] : 0 for key in game_player.c.keys() if key not in IGNORED_COLUMNS}
    
     
     payload = {key.split("_")[-1] : player_stats[key] for key in player_stats.keys()}
 
+    # issue retrieving information from player
     if not player_stats:
         return make_response({"error" : "cannot retrieve player stats"}, 500)
 
  
-    return make_response({"res": "su0p", "rolls" : payload}, 201)
+    return make_response({"result": "success", "rolls" : payload}, 201)
 
     
 

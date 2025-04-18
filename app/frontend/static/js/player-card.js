@@ -37,7 +37,7 @@ class PlayerCard
     {
         FetchFromAPI({
             route: `players/${this.username}/`,
-            method: "POST"
+            method: "GET"
         })
         .then(data => {
             this.content.replaceChildren(JSON.stringify(data["player"]));
