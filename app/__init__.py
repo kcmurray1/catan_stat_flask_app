@@ -22,7 +22,7 @@ def create_app():
     app.register_blueprint(players_bp, url_prefix='/players')
     app.register_blueprint(games_bp, url_prefix='/games')
 
-    from .models import Player, Game
+    from .models import Player, Game, game_player, ModelUtils
     if not path.exists('app/' + DB_NAME):
         with app.app_context():
             db.create_all()

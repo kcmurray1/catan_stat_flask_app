@@ -60,9 +60,13 @@ class GameCard
     
     }
 
-    updateRollChart(newChart)
+    updateRollChart({
+        newChart,
+        header,
+    })
     {
-        this.rollChartCard.cardBody.replaceChildren(newChart.canvas);
+        this.rollChartCard.updateBody(newChart.canvas);
+        this.rollChartCard.updateHeader(header);
     }
     
 
@@ -75,7 +79,10 @@ class GameCard
         })
         .then(data => {
             let {rolls: playerRolls, players: _} = data["game"]
-            this.rollChartCard.cardBody.replaceChildren(new MyBarChart(playerRolls).canvas)
+            this.updateRollChart({
+                newChart: new MyBarChart(playerRolls),
+                header: "All"
+            })
         })
         .catch(error => console.error("Could not retrieve Game: ", error))
 
@@ -101,26 +108,32 @@ class GameCard
             // Object deconstructing
             let {rolls: playerRolls, players: players} = data["game"]
            
-            this.updateRollChart(new MyBarChart(playerRolls))
+            this.updateRollChart({
+                newChart: new MyBarChart(playerRolls), 
+                header: "All"
+            });
+            // Create buttons for each player
             for(let player of players)
             {
-           
-                let gub = new BasicButton({
+                let playerBtn = new BasicButton({
                     innerHTML: player
                 }).element
-                gub.onmousedown = () => {
+                playerBtn.onmousedown = () => {
                     FetchFromAPI({
                         route: `/players/${player}/${this.gameID}/rolls`, 
                         method: "GET"
                     })
                     .then(data => {
                         let roll_data = data["rolls"];
-                        this.updateRollChart(new MyBarChart(roll_data));
+                        this.updateRollChart({
+                            newChart: new MyBarChart(roll_data), 
+                            header: player
+                        });
                     })
                     .catch(error => console.error("Could not reteive Player: ", error))
                 }
                 // Create buttons for each player that display individual performance
-                this.rollChartCard.cardFooter.appendChild(gub);
+                this.rollChartCard.cardFooter.appendChild(playerBtn);
             }
             this.content.appendChild(this.rollChartCard.cardContainer)
         })

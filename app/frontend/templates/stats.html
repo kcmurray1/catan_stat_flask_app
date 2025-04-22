@@ -14,37 +14,37 @@
 
 {% endblock %}
 {% block content %}
-<div class="list-group" id="list-tab" role="tablist">
 
-</div>
        
   
-<div class="col-12 col-md-8 player-stats-container" id="man">
+<div class="col-lg-12 col-md-8 player-stats-container" id="man">
 
 <div class="tab-content" id="nav-tabContent">
     <div class="tab-pane fade show active" id="list-home" role="tabpanel" aria-labelledby="list-home-list">
-      <header>
-        <h1>{{ today  }}</h1>
-      </header>
+      <!-- Display player dashboard here -->
     </div>
 </div>
+<div class="list-group" id="list-tab" role="tablist">
 
+</div>
 <div class="row stats">
     <ul>
       {% for person in people %}
       <script>
-      
-        newCard = new PlayerCard("{{person.first_name}}", "{{person.player_id}}");
+        newCard = new PlayerCard("{{person.first_name}}", "{{person.player_id}}", "{{ person.get_score() }}");
         leftPage = document.getElementById("list-tab");
         leftPage.appendChild(newCard.tab);
 
         rightPage = document.getElementById("nav-tabContent");
 
         rightPage.appendChild(newCard.content)
-        
       </script>
+     
+     
+      
       {% endfor %}
     </ul>
-  </div>
+</div>
 
+</div>
 {% endblock%}

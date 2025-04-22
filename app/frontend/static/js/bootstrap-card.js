@@ -58,12 +58,12 @@ class BootStrapCard
 
     updateHeader(content)
     {
-        this.cardHeader.innerHTML = content;
+        this.cardHeader.replaceChildren(content);
     }
 
     updateBody(content)
     {
-        this.cardBody.innerHTML = content;
+        this.cardBody.replaceChildren(content);
     }
 
     updateTitle(content)

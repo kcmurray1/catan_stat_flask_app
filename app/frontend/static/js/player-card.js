@@ -1,17 +1,17 @@
 class PlayerCard
 {
     
-    constructor(playerName, playerID)
+    constructor(playerName, playerID, score)
     {
-    this.gameID = playerID;
-    this.link = `list-${this.gameID}`
-    this.username = playerName;
+        this.gameID = playerID;
+        this.link = `list-${this.gameID}`
+        this.username = playerName;
 
-    this.tab = CreateElement({
-        name: "a",
-        id: `list-${this.gameID}-list`,
-        classList: ["list-group-item", "list-group-item-action"],
-        innerHTML: playerName
+        this.tab = CreateElement({
+            name: "a",
+            id: `list-${this.gameID}-list`,
+            classList: ["list-group-item", "list-group-item-action"],
+            innerHTML: `${playerName} Score: ${score}`
     });
     this.tab.onclick = () => {
         this.getPlayerData()
@@ -27,13 +27,23 @@ class PlayerCard
     this.content = CreateElement({
         name: "div",
         id: this.link,
-        classList: ["tab-pane" ,"fade"],
-        innerHTML : `Hello ${this.gameID}` 
+        classList: ["tab-pane" ,"fade"] ,
+        innerHTML : `default ${this.gameID}` 
     })
     this.content.setAttribute("role", "tabpanel")
     this.content.setAttribute("aria-labelledby", this.tab.id)
     }
 
+
+    setActive()
+    {
+        this.tab.classList.add("active");
+        this.content.classList.add("show", "active");
+        this.getPlayerData();
+        
+    }
+
+    // Update this to update Dashboard
     getPlayerData()
     {
         FetchFromAPI({
@@ -41,9 +51,7 @@ class PlayerCard
             method: "GET"
         })
         .then(data => {
-            let {games_played: games, id: id, name: playerName} = data["player"];
-
-            console.log(playerName);
+            let {games_played: games, id: id, name: playerName, total_score: total_score} = data["player"];
 
             this.content.replaceChildren(
                 new PlayerDashboard(
@@ -56,13 +64,12 @@ class PlayerCard
     }
 }
 
-// constructor ({id, header, body, title, text, footer})
+
 
 class PlayerDashboard
 {
-    constructor(playerName,games)
+    constructor(playerName, games)
     {
-        console.log(games)
         this.card = new BootStrapCard({
             id: `${playerName}-card`,
             header: playerName,
