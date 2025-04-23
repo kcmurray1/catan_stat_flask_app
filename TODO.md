@@ -6,10 +6,10 @@ FUNCTIONS
     - individual roll frequencies [x]
     Game
     - date [x]
-    - winner **TODO**
+    - winner [x]
     - total roll frequencies(all of players roll frequencies) [x]
 
-2 - interact with player information **NEXT**
+2 - interact with player information **TODO**
     Player
     - Game history
     - individual performance (refer to 1-Players above)
@@ -27,4 +27,5 @@ FUNCTIONS
 
 UI
     - Make game history into scrollable list
+    - Update list to take up width of screen and spaced evenly
 

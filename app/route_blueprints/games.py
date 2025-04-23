@@ -18,7 +18,6 @@ def games_home():
 
 @games_bp.route("/create", methods=["POST"])
 def games_create():
-
     try:
         new_game = GameService.create_game(request.json["players"])
     except Exception as e:
@@ -29,7 +28,6 @@ def games_create():
 
 @games_bp.route("/<int:game_id>")
 def games_data(game_id):
-
     # Verify game exists
     game = get_game(game_id)
 
@@ -37,19 +35,16 @@ def games_data(game_id):
         return make_response({"error" : "game not found"}, 404)
     
     try:
-        total_roll_counts, _ = GameService.game_details(game_id)
+        payload = {}
+        total_roll_counts = GameService.game_details(game_id)
+        payload["rolls"] = total_roll_counts
+        payload["players"] = [x.first_name for x in Game.query.get(game_id).players]
+        payload["winner"] = GameService.get_winner(game_id).first_name
+
     except Exception as e:
         return make_response({"error": str(e)}, 500)
 
-    # Adjust naming of columns(change roll_count_2 to 2, roll_count_3 to 3..etc)
-    payload = dict()
-    payload["rolls"] = {}
-    payload["players"] = [x.first_name for x in Game.query.get(game_id).players]
     
-    column_names = [i for i in range(2, 13)]
-
-    for key, val in zip(column_names, total_roll_counts):
-        payload["rolls"][key] = val 
 
     return make_response({"result" : "success", "game" : payload}, 200)
     

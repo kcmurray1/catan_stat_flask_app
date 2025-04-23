@@ -70,7 +70,7 @@ class GameCard
     }
     
 
-    showAllData()
+    showAllData(winner)
     {
         // Create area to display chart
         FetchFromAPI({
@@ -81,7 +81,7 @@ class GameCard
             let {rolls: playerRolls, players: _} = data["game"]
             this.updateRollChart({
                 newChart: new MyBarChart(playerRolls),
-                header: "All"
+                header: `Winner ${winner}`
             })
         })
         .catch(error => console.error("Could not retrieve Game: ", error))
@@ -96,21 +96,24 @@ class GameCard
             method: "GET",
         })
         .then(data => {
+
+            // Object deconstructing
+            let {rolls: playerRolls, players: players, winner} = data["game"]
+
             this.content.replaceChildren();
             this.rollChartCard.clearCard();
             let allButton = new BasicButton({
                 innerHTML: "All",
             });
             allButton.element.onmousedown = () => {
-                this.showAllData();
+                this.showAllData(winner);
             }
             this.rollChartCard.cardFooter.appendChild(allButton.element)
-            // Object deconstructing
-            let {rolls: playerRolls, players: players} = data["game"]
+        
            
             this.updateRollChart({
                 newChart: new MyBarChart(playerRolls), 
-                header: "All"
+                header: `Winner ${winner}`
             });
             // Create buttons for each player
             for(let player of players)

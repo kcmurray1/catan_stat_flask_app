@@ -1,9 +1,12 @@
-from sqlalchemy import select, update, func
+from sqlalchemy import select, update, func, desc
 from app.utils.db_utils import get_db
 from app.models import Player, Game, game_player
 
 class GameService:
-
+    """
+    Collection of functions used to interact with the Game and Game Associated 
+    tables
+    """
     def create_game(players):
         db = get_db()
 
@@ -28,8 +31,7 @@ class GameService:
         return new_game.game_id
 
     def add_game_roll(username, roll):
-
-        print(username, roll)
+        
         db = get_db()
 
         roll_column = f"roll_count_{roll}"
@@ -70,5 +72,27 @@ class GameService:
             .where(game_player.c.player_id == Player.player_id)
         ).mappings()
 
+        # Adjust naming of columns(change roll_count_2 to 2, roll_count_3 to 3..etc)
+        formatted_roll_counts = dict()
+        
+        column_names = [i for i in range(2, 13)]
 
-        return total_roll_counts, game_data
+        for key, val in zip(column_names, total_roll_counts):
+            formatted_roll_counts[key] = val 
+
+        return formatted_roll_counts
+    
+    def get_winner(game_id) -> Player:
+        """Return Player that had greatest score for a game"""
+        return get_db().session.scalar(
+        select(
+            Player,
+            func.sum(game_player.c.score).label("total_score")
+        )
+        .join(game_player, Player.player_id == game_player.c.player_id)
+        .group_by(Player.player_id, Player.first_name)
+        .where(game_player.c.game_id == game_id)
+        .order_by(desc("total_score"))
+        )
+
+         

@@ -16,7 +16,6 @@ class Player(db.Model):
         return f"{self.first_name}"
     
     
-    
     def get_score(self):
         return ModelUtils.total_score(self.player_id)
 

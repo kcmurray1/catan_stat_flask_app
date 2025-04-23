@@ -1,70 +1,73 @@
-class PlayerCard
+class PCard
 {
-    
-    constructor(playerName, playerID, score)
+    constructor(playerName, playerID, score, rank, ignoreLink=false)
     {
         this.gameID = playerID;
-        this.link = `list-${this.gameID}`
+        this.link = `stats/${playerName}`
         this.username = playerName;
-
-        this.tab = CreateElement({
-            name: "a",
-            id: `list-${this.gameID}-list`,
-            classList: ["list-group-item", "list-group-item-action"],
-            innerHTML: `${playerName} Score: ${score}`
-    });
-    this.tab.onclick = () => {
-        this.getPlayerData()
-    }
-
-    this.tab.setAttribute("data-toggle", "list");
-    this.tab.href = `#${this.link}`;
-
-    this.tab.setAttribute("role", "tab");
-    this.tab.setAttribute("aria-controls", this.gameID)
-
-
-    this.content = CreateElement({
-        name: "div",
-        id: this.link,
-        classList: ["tab-pane" ,"fade"] ,
-        innerHTML : `default ${this.gameID}` 
-    })
-    this.content.setAttribute("role", "tabpanel")
-    this.content.setAttribute("aria-labelledby", this.tab.id)
-    }
-
-
-    setActive()
-    {
-        this.tab.classList.add("active");
-        this.content.classList.add("show", "active");
-        this.getPlayerData();
         
+        let tabContent = new BootstrapRow("fastone", ["row"])
+        tabContent.addRowText(rank);
+        tabContent.addRowText(this.username);
+        tabContent.addRowText(score);
+
+        
+        this.tab = new BootstrapGroupItem(this.gameID, ignoreLink ? null : this.link)
+        this.tab.addItem(tabContent.element);
     }
 
-    // Update this to update Dashboard
-    getPlayerData()
+    render()
     {
-        FetchFromAPI({
-            route: `players/${this.username}/`,
-            method: "GET"
-        })
-        .then(data => {
-            let {games_played: games, id: id, name: playerName, total_score: total_score} = data["player"];
-
-            this.content.replaceChildren(
-                new PlayerDashboard(
-                    playerName,
-                    games
-                ).element
-        );
-        })
-        .catch(error => console.error("Could not retrieve Player: ", error))
+        return this.tab.element;
     }
 }
 
+class BootstrapRow
+{
+    constructor(id, classList)
+    {
+        this.element = CreateElement({
+            name: "div",
+            id: id,
+            classList: classList,
+        });
+    }
 
+    addRowText(rowTextElement)
+    {
+        this.element.appendChild(
+            CreateElement({
+                name: "div",
+                classList: "p-2",
+                innerHTML: rowTextElement
+            })
+        )
+    }
+  
+}
+
+class BootstrapGroupItem
+{
+    constructor(id, link=null)
+    {
+        this.element = CreateElement({
+            name: "a",
+            id: `list-${id}-list`,
+            classList: ["list-group-item", "list-group-item-action"],
+        });
+
+        if(link)
+        {
+            this.element.href = link;
+        }
+        
+    }
+
+    addItem(groupItemElement)
+    {
+        this.element.appendChild(groupItemElement);
+    }
+}
 
 class PlayerDashboard
 {
