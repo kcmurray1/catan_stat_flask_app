@@ -43,8 +43,25 @@ class BootstrapRow
             })
         )
     }
-  
+
+    addColumnText(columnText)
+    {
+        this.element.appendChild(
+            CreateElement({
+            name: "div",
+            classList: ["col"],
+            innerHTML: columnText
+            })
+        );
+    }
+
+    addColumnElement(columnElement)
+    {
+        this.element.appendChild(columnElement);
+    }
+
 }
+
 
 class BootstrapGroupItem
 {
@@ -71,14 +88,77 @@ class BootstrapGroupItem
 
 class PlayerDashboard
 {
-    constructor(playerName, games)
-    {
-        this.card = new BootStrapCard({
-            id: `${playerName}-card`,
-            header: playerName,
-            body: JSON.stringify(games)
-        });
+   constructor(name, games, total_score)
+   {
 
-        this.element = this.card.cardContainer
-    }
+        this.container = CreateElement({
+            name: "div",
+            classList: "stats-container"
+        })
+
+        this.firstRow = new BootstrapRow("first-row", "row");
+        this.firstRow.addColumnText(name);
+
+        this.basicInfo = CreateElement({
+            name: "div",
+            classList: ["col"]
+        });
+        this.basicInfo.appendChild(
+            CreateElement({
+                name: "p",
+                innerHTML: "Rank"
+            })
+        );
+
+        this.basicInfo.appendChild(
+            CreateElement({
+                name: "p",
+                innerHTML: total_score
+            })
+        );
+
+        this.firstRow.addColumnElement(this.basicInfo);
+
+        let secondRow = new BootstrapRow("second-row", "row");
+
+        secondRow.addColumnElement(this.createGamesList(games));
+    
+        this.container.appendChild(this.firstRow.element);
+        
+        this.container.appendChild(secondRow.element);
+
+   }
+
+   createGamesList(games)
+   {
+     let gameListContainer = CreateElement({
+        name: "section",
+        id: "gameList-container",
+        classList: "container",
+        innerHTML: "Games"
+     })
+
+     let gameListColumn = CreateElement({
+        name: "span",
+        id: "gameList-col",
+        classList: "col"
+     })
+
+     for(let x of games)
+     {
+        let item = new BootstrapGroupItem(x.id);
+        let itemContent = new BootstrapRow(x.id, ["row"])
+        itemContent.addRowText(x.date)
+        item.addItem(itemContent.element);
+        gameListColumn.appendChild(
+            item.element
+        );
+     }
+
+     gameListContainer.appendChild(gameListColumn);
+
+     return gameListContainer;
+
+
+   }
 }

@@ -37,7 +37,13 @@
     </script>
     {% endfor %}
   {% elif player %}
-    {{ player }}
+    <script>
+      let x = new PlayerDashboard( "{{ player.name }}", {{ player.games_played | tojson }}, "{{ player.total_score }}"  )
+      let y = document.getElementById("list-players");
+      y.appendChild(x.container)
+
+    </script>
+    
   {% endif %}
 
 </div>
