@@ -1,4 +1,4 @@
-from flask import Blueprint, make_response, render_template, redirect, url_for, current_app, jsonify
+from flask import Blueprint, make_response, render_template, redirect, url_for, request, flash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import select, desc, func
 from app.models import Player, Game, game_player
@@ -8,8 +8,10 @@ from datetime import date
 """Display informatio for user"""
 view_bp = Blueprint('/',__name__,  url_prefix='/')
 
-@view_bp.route('/')
+@view_bp.route('/', methods=["GET", "POST"])
 def view_home():
+
+    print(request.method)
     current_date = date.today()
 
     db = get_db()
@@ -19,14 +21,20 @@ def view_home():
     return render_template("index.html", people=Player.query.all(), game_history= [game["Game"] for game in all_games] ,today=current_date.strftime("%m/%d/%Y"))
 
 
-@view_bp.route('/remove-player')
+@view_bp.route('/remove-player', methods=["POST"])
 def remove_player():
     # p = Player.query.get()
     # if p:
     #     db = get_db()
     #     db.session.delete(p)
     #     db.session.commit()
-    return "hi"
+    x = request.form.get("mail")
+
+    if int(x) % 2 == 0:
+        flash("nice job!", category="success")    
+    else:
+        flash("test stuff", category="error")
+    return redirect(url_for("/.view_home"))
 
 @view_bp.route('/stats')
 def stats():        

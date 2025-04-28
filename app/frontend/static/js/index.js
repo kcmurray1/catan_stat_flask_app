@@ -6,6 +6,63 @@ document.addEventListener("DOMContentLoaded", function()
 });
 
 
+
+class ScoreField
+{
+    constructor({label})
+    {
+        this.form = CreateElement({
+            name: "form",
+            id:"score",
+        })
+
+        this.form.setAttribute("action", `/games/add-score/${label}`);
+        
+        this.form.setAttribute("method", "post");
+
+        let formGroup = CreateElement({
+            name: "div",
+            classList: "form-group"
+        });
+
+        this.form.appendChild(formGroup);
+
+        let formLabel = CreateElement({
+            name: "label",
+            innerHTML: label
+        });
+
+        formLabel.setAttribute("for", this.form.id);
+
+        let formInput = CreateElement({
+            name: "input",
+            classList: "form-control",
+            id: "score"
+        });
+
+        formInput.setAttribute("name", "score");
+
+        let formSubmit = CreateElement({
+            name: "button",
+            classList: ["btn", "btn-primary"],
+            innerHTML: "submit"
+        })
+
+        formSubmit.setAttribute("type", "submit")
+
+        formGroup.appendChild(formLabel);
+
+        formGroup.appendChild(formInput);
+
+        formGroup.appendChild(formSubmit);
+
+
+
+
+
+    }
+}
+
 class BasicButton
 {
     constructor({innerHTML=null})
@@ -237,6 +294,8 @@ class Game
       
 
         this.rightContainer.appendChild(this.rightCard.cardContainer);
+
+        // this.leftCard.cardFooter.appendChild(new ScoreField({label: "test"}).form )
         
 
 

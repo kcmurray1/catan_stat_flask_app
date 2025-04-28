@@ -1,4 +1,4 @@
-from flask import Blueprint, make_response, request
+from flask import Blueprint, make_response, request, flash, redirect, url_for
 from app.utils.db_utils import get_db
 from app.models import *
 from sqlalchemy import select, func
@@ -59,3 +59,19 @@ def add_roll(username):
         return make_response({"error": str(e)}, 500)
 
     return make_response({"result": "nice!"}, 201)
+
+
+@games_bp.route("/add-score/<username>", methods=["POST"])
+def add_score(username):
+    score = request.form.get("score")
+
+    score = int(score)
+    # verify score
+    if score % 2 == 0:
+        flash("nice job!", category="success")    
+    else:
+        flash("test stuff", category="error")
+    # update score
+
+    # return home page
+    return redirect(url_for("/.view_home"))
