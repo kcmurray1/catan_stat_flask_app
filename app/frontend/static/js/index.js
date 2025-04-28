@@ -5,60 +5,86 @@ document.addEventListener("DOMContentLoaded", function()
     var game = new Game()
 });
 
-
-
-class ScoreField
+class MyForm
 {
-    constructor({label})
+    constructor(myAction, myMethod)
     {
         this.form = CreateElement({
             name: "form",
             id:"score",
         })
 
-        this.form.setAttribute("action", `/games/add-score/${label}`);
+        this.form.setAttribute("action", myAction);
         
-        this.form.setAttribute("method", "post");
+        this.form.setAttribute("method", myMethod);
 
-        let formGroup = CreateElement({
+        this.formGroup = CreateElement({
             name: "div",
-            classList: "form-group"
+            classList: ["form-group", "col"]
         });
 
-        this.form.appendChild(formGroup);
+        this.formRow = CreateElement({
+            name: "div",
+            classList: "row"
+        })
 
-        let formLabel = CreateElement({
-            name: "label",
-            innerHTML: label
-        });
 
-        formLabel.setAttribute("for", this.form.id);
-
-        let formInput = CreateElement({
-            name: "input",
-            classList: "form-control",
-            id: "score"
-        });
-
-        formInput.setAttribute("name", "score");
-
-        let formSubmit = CreateElement({
+        this.formSubmit = CreateElement({
             name: "button",
             classList: ["btn", "btn-primary"],
             innerHTML: "submit"
         })
 
-        formSubmit.setAttribute("type", "submit")
+        this.formSubmit.setAttribute("type", "submit")
+        this.formGroup.appendChild(this.formRow);
+        this.formGroup.appendChild(this.formSubmit);
 
-        formGroup.appendChild(formLabel);
+        this.form.appendChild(this.formGroup);
+    }
 
-        formGroup.appendChild(formInput);
+    addInput(label, name)
+    {
+        let x = new ScoreField({
+            label: label,
+            myFor: this.form.id,
+            name: name
+        });
+        this.formRow.appendChild(x.formContainer);
+    }
 
-        formGroup.appendChild(formSubmit);
+}
 
+class ScoreField
+{
+    constructor({label, myFor, name})
+    {
+        this.formContainer = CreateElement({
+            name: "div",
+            classList: "col"
+        })
 
+        this.formLabel = CreateElement({
+            name: "label",
+            innerHTML: label
+        });
 
+        this.formLabel.setAttribute("for", myFor);
 
+        this.formInput = CreateElement({
+            name: "input",
+            classList: "form-control",
+            id: name
+        });
+
+        this.formInput.setAttribute("name", name);
+        this.formInput.setAttribute("type", "number");
+        this.formInput.setAttribute("min", "0")
+        this.formInput.style = "width: 6ch;"
+
+        this.formContainer.appendChild(this.formLabel);
+        this.formContainer.appendChild(this.formInput);
+
+       
 
     }
 }
@@ -95,11 +121,14 @@ class GameCard
         this.tab.onclick = () => {
             this.getGameData()
         }
-        this.tab.setAttribute("data-toggle", "list");
-        this.tab.href = `#${this.link}`;
-   
-        this.tab.setAttribute("role", "tab");
-        this.tab.setAttribute("aria-controls", this.gameID)
+        AddAttributes(new Map([
+            ["data-toggle", "list"],
+            ["href", `#${this.link}`],
+            ["role", "tab"],
+            ["aria-controls", this.gameID]
+            ]),
+            this.tab
+        );
 
     
         this.content = CreateElement({
@@ -108,8 +137,11 @@ class GameCard
             classList: ["tab-pane" ,"fade"],
             innerHTML : `Hello ${this.gameID}` 
         })
-        this.content.setAttribute("role", "tabpanel")
-        this.content.setAttribute("aria-labelledby", this.tab.id)
+
+        AddAttributes(new Map([
+            ["role", "tabpanel"],
+            ["aria-labelledby", this.tab.id]
+        ]), this.content)
 
         this.rollChartCard = new BootStrapCard({
             title: "<h1>Total</h1>",
@@ -200,8 +232,6 @@ class GameCard
         .catch(error => console.error("Could not retrieve Game: ", error))
     }
 }
-
-
 
 
 class Game
@@ -295,7 +325,7 @@ class Game
 
         this.rightContainer.appendChild(this.rightCard.cardContainer);
 
-        // this.leftCard.cardFooter.appendChild(new ScoreField({label: "test"}).form )
+       
         
 
 
@@ -341,8 +371,28 @@ class Game
 
     endGame()
     {
-        const confirmEnd = window.confirm("Are you sure you want to end the game?");
-        if(confirmEnd){window.location.reload();}
+        // Create window to update scores
+        let testRow = new MyForm(`/games/add-score/${this.gameID}`, "post");
+        for(let player of this.players)
+        {
+            testRow.addInput(`${player.element.id}`, `${player.element.id}`);
+        }
+        testRow.formSubmit.addEventListener('click', function(event)
+        {
+            const confirmEnd = window.confirm("Are you sure you want to end the game?");
+            if(confirmEnd)
+            {
+                window.location.reload();
+            }
+            else
+            {
+                // Ignore submit if user decides not to end
+                event.preventDefault();
+            }
+        });
+        this.leftCard.clearCard();
+        this.leftCard.cardBody.replaceChildren(testRow.form);
+
     }
 
     start()

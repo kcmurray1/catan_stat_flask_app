@@ -12,7 +12,6 @@ class MyBarChart
 
         let test = this.canvas.getContext('2d');
         // Create chart
-        console.log(barData);
 
         const BAR_COLORS = ["red", "green","blue","orange","brown", "yellow", "purple", "black", "gray", "violet", "teal"];
 

@@ -52,6 +52,25 @@ class GameService:
 
         db.session.commit()
     
+    def update_scores(game_id, username, score):
+        print(type(score))
+        db = get_db()
+
+        db.session.execute(
+            update(game_player)
+            .where(
+                game_player.c.game_id == game_id
+            )
+            .where(
+                game_player.c.player_id == select(Player.player_id).where(Player.first_name == username).scalar_subquery()
+            )
+            .values(
+                {"score": int(score)}
+            )
+        )
+
+        db.session.commit()
+    
     def game_details(game_id):
         db = get_db()
 

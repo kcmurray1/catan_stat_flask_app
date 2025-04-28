@@ -20,6 +20,15 @@ function CreateElement({name, id, classList, innerHTML=null})
     return newElement;
 }
 
+function AddAttributes(attributesMap, element)
+{
+    for(let [attr, value] of attributesMap)
+    {
+        element.setAttribute(attr, value);
+    }
+}
+
+
 async function FetchFromAPI({route, method, body=null}) {
     try {
 
@@ -50,25 +59,74 @@ async function FetchFromAPI({route, method, body=null}) {
     }
 }
 
-
-function CreateElement({name, id, classList, innerHTML=null})
+class BootstrapRow
 {
-    let newElement = document.createElement(name);
-
-    if (classList instanceof Array)
+    constructor(id, classList)
     {
-        for(let className of classList)
-            newElement.classList.add(className);
-    }
-    else
-    {
-        newElement.classList.add(classList);
+        this.element = CreateElement({
+            name: "div",
+            id: id,
+            classList: classList,
+        });
     }
 
-    newElement.id = id;
-   
-    if(innerHTML)
-        newElement.innerHTML = innerHTML;
+    addRowText(rowTextElement)
+    {
+        this.element.appendChild(
+            CreateElement({
+                name: "div",
+                classList: "p-2",
+                innerHTML: rowTextElement
+            })
+        )
+    }
 
-    return newElement;
+    addColumnText(columnText)
+    {
+        this.element.appendChild(
+            CreateElement({
+            name: "div",
+            classList: ["col"],
+            innerHTML: columnText
+            })
+        );
+    }
+
+    addColumnElement(columnElement)
+    {
+        this.element.appendChild(columnElement);
+    }
+
+    addElements(elementList)
+    {
+        for(let element of elementList)
+        {
+            this.element.appendChild(element);
+        }
+    }
+
+}
+
+
+class BootstrapGroupItem
+{
+    constructor(id, link=null)
+    {
+        this.element = CreateElement({
+            name: "a",
+            id: `list-${id}-list`,
+            classList: ["list-group-item", "list-group-item-action"],
+        });
+
+        if(link)
+        {
+            this.element.href = link;
+        }
+        
+    }
+
+    addItem(groupItemElement)
+    {
+        this.element.appendChild(groupItemElement);
+    }
 }

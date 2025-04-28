@@ -22,69 +22,6 @@ class PCard
     }
 }
 
-class BootstrapRow
-{
-    constructor(id, classList)
-    {
-        this.element = CreateElement({
-            name: "div",
-            id: id,
-            classList: classList,
-        });
-    }
-
-    addRowText(rowTextElement)
-    {
-        this.element.appendChild(
-            CreateElement({
-                name: "div",
-                classList: "p-2",
-                innerHTML: rowTextElement
-            })
-        )
-    }
-
-    addColumnText(columnText)
-    {
-        this.element.appendChild(
-            CreateElement({
-            name: "div",
-            classList: ["col"],
-            innerHTML: columnText
-            })
-        );
-    }
-
-    addColumnElement(columnElement)
-    {
-        this.element.appendChild(columnElement);
-    }
-
-}
-
-
-class BootstrapGroupItem
-{
-    constructor(id, link=null)
-    {
-        this.element = CreateElement({
-            name: "a",
-            id: `list-${id}-list`,
-            classList: ["list-group-item", "list-group-item-action"],
-        });
-
-        if(link)
-        {
-            this.element.href = link;
-        }
-        
-    }
-
-    addItem(groupItemElement)
-    {
-        this.element.appendChild(groupItemElement);
-    }
-}
 
 class PlayerDashboard
 {

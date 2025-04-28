@@ -61,17 +61,26 @@ def add_roll(username):
     return make_response({"result": "nice!"}, 201)
 
 
-@games_bp.route("/add-score/<username>", methods=["POST"])
-def add_score(username):
-    score = request.form.get("score")
+@games_bp.route("/add-score/<int:game_id>", methods=["POST"])
+def add_score(game_id):
+    # for player_name in request.form:
+    #     print(player_name, request.form.get(player_name))
 
-    score = int(score)
-    # verify score
-    if score % 2 == 0:
-        flash("nice job!", category="success")    
-    else:
-        flash("test stuff", category="error")
+    try:
+        for player_name in request.form:
+            GameService.update_scores(game_id, player_name, request.form.get(player_name))
+        # verify score
+        if 1 % 2 == 0:
+            flash("nice job!", category="success")    
+        else:
+            flash("test stuff", category="error")
+    except ValueError as e:
+        flash(str(e), category="error")
+
+  
+
     # update score
 
     # return home page
+  
     return redirect(url_for("/.view_home"))

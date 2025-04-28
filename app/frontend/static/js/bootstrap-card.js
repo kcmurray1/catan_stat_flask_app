@@ -51,7 +51,7 @@ class BootStrapCard
     {
         this.cardFooter.replaceChildren();
         this.cardBody.replaceChildren();
-        this.cardFooter.replaceChildren();
+        this.cardHeader.replaceChildren();
         this.cardText.replaceChildren();
         this.cardTitle.replaceChildren();
     }
