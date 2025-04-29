@@ -19,10 +19,14 @@
   
 <div class="col-lg-12 col-md-8 player-stats-container" id="man">
 
-  <div class="list-group" id="list-players" role="tablist">
+ 
 
+  <div class="stats-player-container" id="player-stats-container">
   </div>
   {% if people %}
+   <div class="list-group" id="list-players" role="tablist">
+
+  </div>
     <script>
       let rank = 1;
       leftPage = document.getElementById("list-players");
@@ -39,7 +43,7 @@
   {% elif player %}
     <script>
       let x = new PlayerDashboard( "{{ player.name }}", {{ player.games_played | tojson }}, "{{ player.total_score }}"  )
-      let y = document.getElementById("list-players");
+      let y = document.getElementById("player-stats-container");
       y.appendChild(x.container)
 
     </script>

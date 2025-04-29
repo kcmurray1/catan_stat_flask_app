@@ -197,7 +197,7 @@ class GameCard
             allButton.element.onmousedown = () => {
                 this.showAllData(winner);
             }
-            this.rollChartCard.cardFooter.appendChild(allButton.element)
+            this.rollChartCard.cardFooter.replaceChildren(allButton.element)
         
            
             this.updateRollChart({
@@ -273,6 +273,11 @@ class Game
         this.leftCard = new BootStrapCard({
             header: "Available Colors",  
         })
+        let leftCardNote = CreateElement({
+            name: "p",
+            innerHTML: "<b>Note</b>: add players in the same order as their turn"
+        })
+        this.leftCard.cardFooter.appendChild(leftCardNote);
 
         this.leftContainer.appendChild(this.leftCard.cardContainer);
 
@@ -390,7 +395,6 @@ class Game
                 event.preventDefault();
             }
         });
-        this.leftCard.clearCard();
         this.leftCard.cardBody.replaceChildren(testRow.form);
 
     }
@@ -398,7 +402,7 @@ class Game
     start()
     {
         if(this.players.length < 1){return;}
-
+        this.leftCard.cardFooter.replaceChildren();
         let activePlayer = this.players[this.currentPlayer];
         let player_info = []
         for(let player of this.players)

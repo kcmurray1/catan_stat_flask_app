@@ -66,6 +66,11 @@ class BootStrapCard
         this.cardBody.replaceChildren(content);
     }
 
+    updateFooter(content)
+    {
+        this.cardFooter.replaceChildren(content);
+    }
+
     updateTitle(content)
     {
         this.cardTitle.innerHTML = content;

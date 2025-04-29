@@ -69,11 +69,9 @@ def add_score(game_id):
     try:
         for player_name in request.form:
             GameService.update_scores(game_id, player_name, request.form.get(player_name))
-        # verify score
-        if 1 % 2 == 0:
-            flash("nice job!", category="success")    
-        else:
-            flash("test stuff", category="error")
+     
+        flash("Game Complete!", category="success")    
+
     except ValueError as e:
         flash(str(e), category="error")
 
@@ -82,5 +80,4 @@ def add_score(game_id):
     # update score
 
     # return home page
-  
     return redirect(url_for("/.view_home"))

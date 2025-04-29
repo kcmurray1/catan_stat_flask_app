@@ -18,7 +18,7 @@ FUNCTIONS
 
 3 - Update Game **use form in index.html to create javascript object for player score input field**
     - Allow users to quit the process of recording rolls [x]
-    - allow user to enter final scores before quitting the game
+    - allow user to enter final scores before quitting the game 
     - display next player's turn
     - show player order before starting game
 
@@ -29,6 +29,6 @@ FUNCTIONS
 
 
 UI
-    - Make game history into scrollable list
+    - Make game history into scrollable list [x]
     - Update list to take up width of screen and spaced evenly
 

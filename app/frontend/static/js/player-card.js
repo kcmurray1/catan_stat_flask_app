@@ -71,14 +71,8 @@ class PlayerDashboard
      let gameListContainer = CreateElement({
         name: "section",
         id: "gameList-container",
-        classList: "container",
+        classList: ["container", "list-group", "col"],
         innerHTML: "Games"
-     })
-
-     let gameListColumn = CreateElement({
-        name: "span",
-        id: "gameList-col",
-        classList: "col"
      })
 
      for(let x of games)
@@ -87,12 +81,12 @@ class PlayerDashboard
         let itemContent = new BootstrapRow(x.id, ["row"])
         itemContent.addRowText(x.date)
         item.addItem(itemContent.element);
-        gameListColumn.appendChild(
+        gameListContainer.appendChild(
             item.element
         );
      }
 
-     gameListContainer.appendChild(gameListColumn);
+    //  gameListContainer.appendChild(gameListColumn);
 
      return gameListContainer;
 
